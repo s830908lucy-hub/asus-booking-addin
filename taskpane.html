@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ASUS 會議室預約</title>
+  <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "Microsoft JhengHei", "Segoe UI", sans-serif;
+      background: #f3f6fb;
+      color: #1a1a2e;
+      min-height: 100vh;
+    }
+
+    .header {
+      background: #00539b;
+      color: white;
+      padding: 16px 18px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .header-logo {
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: -1px;
+    }
+    .header-sub {
+      font-size: 12px;
+      opacity: 0.85;
+      line-height: 1.4;
+    }
+
+    .section {
+      margin: 14px 14px 0;
+      background: white;
+      border-radius: 10px;
+      padding: 14px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+    }
+    .section-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 10px;
+    }
+
+    /* 日期顯示卡片 */
+    .date-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: #eef4fb;
+      border: 1.5px solid #b8d4f0;
+      border-radius: 8px;
+      padding: 10px 12px;
+    }
+    .date-icon { font-size: 22px; }
+    .date-info .label { font-size: 11px; color: #666; }
+    .date-info .value {
+      font-size: 16px;
+      font-weight: 700;
+      color: #00539b;
+      letter-spacing: 0.03em;
+    }
+
+    /* 主按鈕 */
+    .btn-main {
+      width: 100%;
+      margin-top: 12px;
+      padding: 12px;
+      background: #00539b;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+      letter-spacing: 0.02em;
+    }
+    .btn-main:hover { background: #003d74; }
+    .btn-main:active { transform: scale(0.98); }
+    .btn-main:disabled { background: #a0b8cc; cursor: not-allowed; }
+
+    /* 步驟說明 */
+    .steps { margin-top: 4px; }
+    .step {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 7px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .step:last-child { border-bottom: none; }
+    .step-num {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #00539b;
+      color: white;
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .step-text { font-size: 12px; color: #444; line-height: 1.5; }
+
+    /* 狀態訊息 */
+    .status {
+      margin: 12px 14px 0;
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      display: none;
+    }
+    .status.success { background: #e6f4ea; color: #1e7e34; border: 1px solid #a8d5b0; display: block; }
+    .status.error   { background: #fdecea; color: #c0392b; border: 1px solid #f0b8b8; display: block; }
+    .status.info    { background: #e8f0fb; color: #00539b; border: 1px solid #b0ccf0; display: block; }
+
+    .footer {
+      margin: 16px 14px;
+      font-size: 11px;
+      color: #aaa;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="header-logo">ASUS</div>
+    <div class="header-sub">會議室預約 Agent<br>立德8F會議室 (LiDe)</div>
+  </div>
+
+  <!-- 日期卡片 -->
+  <div class="section">
+    <div class="section-label">會議開始日期</div>
+    <div class="date-card">
+      <div class="date-icon">📅</div>
+      <div class="date-info">
+        <div class="label">從 Outlook 會議讀取</div>
+        <div class="value" id="meeting-date">讀取中...</div>
+      </div>
+    </div>
+    <button class="btn-main" id="btn-open" onclick="openBooking()" disabled>
+      🏢 開啟預約系統並搜尋
+    </button>
+  </div>
+
+  <!-- 步驟說明 -->
+  <div class="section">
+    <div class="section-label">自動執行步驟</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-text">開啟 ASUS Booking System，按第一個 OK</div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-text">自動選擇「立德8F會議室 (LiDe)」，按第二個 OK</div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-text">填入會議日期，點擊開始搜尋</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="status" id="status-msg"></div>
+
+  <div class="footer">僅供個人使用 · 不儲存任何資料</div>
+
+  <script src="taskpane.js"></script>
+</body>
+</html>
